@@ -11,6 +11,8 @@ const FRONTEND_URLS = [
   process.env.FRONTEND_URL,
   'https://autolog-backend-api.onrender.com',
   'https://auto-log-sttq-ipy6e6pe0-selim-isiks-projects.vercel.app',
+
+  'https://auto-4g3mguzbs-selim-isiks-projects.vercel.app',
 ].filter(Boolean);
 
 export const startServer = () => {

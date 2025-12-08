@@ -6,7 +6,7 @@ import router from './routers/index.js';
 import { env } from './utils/env.js';
 
 const PORT = Number(env('PORT', '3000'));
-const FRONTEND_URL = env('FRONTEND_URL');
+const FRONTEND_URL = env('FRONTEND_URL') || 'http://localhost:5173';
 
 export const startServer = () => {
   const app = express();
@@ -30,23 +30,19 @@ export const startServer = () => {
   );
 
   app.get('/', (req, res) => {
-    res.json({
-      message: 'Hello World!',
-    });
+    res.json({ message: 'Hello World!' });
   });
+
   app.use(router);
 
   app.use((req, res) => {
-    res.status(404).json({
-      message: 'Not found',
-    });
+    res.status(404).json({ message: 'Not found' });
   });
 
   app.use((err, req, res) => {
-    res.status(500).json({
-      message: 'Something went wrong',
-      error: err.message,
-    });
+    res
+      .status(500)
+      .json({ message: 'Something went wrong', error: err.message });
   });
 
   app.listen(PORT, () => {

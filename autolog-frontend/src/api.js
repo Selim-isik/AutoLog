@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: "https://autolog-backend-api.onrender.com",
+  withCredentials: true,
 });
 
 api.interceptors.request.use((config) => {

@@ -3,10 +3,9 @@ import pino from 'pino-http';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import router from './routers/index.js';
-import { env } from './utils/env.js';
 
-const PORT = Number(env('PORT', '3000'));
-const FRONTEND_URL = env('FRONTEND_URL') || 'http://localhost:5173';
+const PORT = process.env.PORT || 3000;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 export const startServer = () => {
   const app = express();
@@ -23,9 +22,7 @@ export const startServer = () => {
 
   app.use(
     pino({
-      transport: {
-        target: 'pino-pretty',
-      },
+      transport: { target: 'pino-pretty' },
     }),
   );
 

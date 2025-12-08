@@ -1,4 +1,6 @@
-// src/index.js
+import dotenv from 'dotenv';
+dotenv.config(); // BUNSUZ ÇALIŞMAZ
+
 import { initMongoDB } from './db/initMongoDB.js';
 import { startServer } from './server.js';
 

@@ -6,7 +6,6 @@ import {
   Card,
   Typography,
   message,
-  Select,
   ConfigProvider,
   theme,
 } from "antd";
@@ -22,17 +21,24 @@ import { useTheme } from "../../context/ThemeContext";
 import "./Register.css";
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
 const Register = () => {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
   const [loading, setLoading] = useState(false);
 
+  const [form] = Form.useForm();
+
   const onFinish = async (values) => {
     setLoading(true);
+
+    const finalValues = {
+      ...values,
+      role: "customer",
+    };
+
     try {
-      await api.post("/auth/register", values);
+      await api.post("/auth/register", finalValues);
       message.success("Registration successful! Please login.");
       navigate("/login");
     } catch (error) {
@@ -68,8 +74,8 @@ const Register = () => {
           </div>
 
           <Form
+            form={form}
             name="register"
-            initialValues={{ role: "mechanic" }}
             onFinish={onFinish}
             layout="vertical"
             size="large"
@@ -101,17 +107,6 @@ const Register = () => {
                 prefix={<LockOutlined />}
                 placeholder="Password"
               />
-            </Form.Item>
-
-            <Form.Item
-              name="role"
-              label="I am a..."
-              rules={[{ required: true }]}
-            >
-              <Select>
-                <Option value="mechanic">🛠 Mechanic (Service Provider)</Option>
-                <Option value="customer">👤 Customer (Car Owner)</Option>
-              </Select>
             </Form.Item>
 
             <Form.Item>

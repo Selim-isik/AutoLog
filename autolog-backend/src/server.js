@@ -5,7 +5,13 @@ import cookieParser from 'cookie-parser';
 import router from './routers/index.js';
 
 const PORT = process.env.PORT || 3000;
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const HOST = '0.0.0.0';
+const FRONTEND_URLS = [
+  'http://localhost:5173',
+  process.env.FRONTEND_URL,
+  'https://autolog-backend-api.onrender.com',
+  'https://auto-log-sttq-ipy6e6pe0-selim-isiks-projects.vercel.app',
+].filter(Boolean);
 
 export const startServer = () => {
   const app = express();
@@ -14,7 +20,7 @@ export const startServer = () => {
   app.use(express.urlencoded({ limit: '10mb', extended: true }));
   app.use(
     cors({
-      origin: FRONTEND_URL,
+      origin: FRONTEND_URLS,
       credentials: true,
     }),
   );
@@ -42,7 +48,9 @@ export const startServer = () => {
       .json({ message: 'Something went wrong', error: err.message });
   });
 
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  app.listen(PORT, HOST, () => {
+    console.log(`Server is running on port ${PORT} on host ${HOST}`);
   });
 };
+
+startServer();

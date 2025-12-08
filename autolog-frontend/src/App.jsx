@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/Login/Login";
-import Register from "./pages/Register/Register";
-import Dashboard from "./pages/Dashboard/Dashboard";
-import CarDetail from "./pages/CarDetail/CarDetail";
-import Customers from "./pages/Customers/Customers";
+import Login from "./Pages/Login/Login";
+import Register from "./Pages/Register/Register";
+import Dashboard from "./Pages/Dashboard/Dashboard";
+import CarDetail from "./Pages/CarDetail/CarDetail";
+import Customers from "./Pages/Customers/Customers";
 import Settings from "./Pages/Settings/Settings";
 
 function App() {

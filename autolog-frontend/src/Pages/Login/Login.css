@@ -1,0 +1,24 @@
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #f0f2f5;
+}
+
+.login-card {
+  width: 350px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+}
+
+.login-btn {
+  background-color: #001529;
+  border-color: #001529;
+  font-weight: bold;
+}
+
+.login-btn:hover {
+  background-color: #002c55 !important;
+  border-color: #002c55 !important;
+}

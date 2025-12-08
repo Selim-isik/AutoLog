@@ -1,0 +1,28 @@
+.detail-container {
+  padding: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.car-header-card {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.history-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.car-cover-image {
+  height: 300px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.status-tag {
+  font-size: 16px;
+  padding: 5px 15px;
+}

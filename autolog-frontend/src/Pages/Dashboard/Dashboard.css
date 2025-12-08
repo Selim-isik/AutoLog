@@ -1,0 +1,347 @@
+html,
+body {
+  background-color: #000 !important;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+body.light-mode {
+  background-color: #f0f2f5 !important;
+}
+
+body.dark-mode {
+  background-color: #000 !important;
+}
+
+.ant-layout {
+  background: transparent !important;
+}
+
+.ant-layout-content {
+  background: transparent !important;
+}
+
+.ant-layout-sider {
+  background: var(--sider-bg) !important;
+}
+
+body.dark-mode .ant-layout-sider {
+  --sider-bg: #001529;
+}
+
+body.light-mode .ant-layout-sider {
+  --sider-bg: #ffffff;
+}
+
+.dashboard-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.car-image {
+  height: 200px;
+  object-fit: cover;
+}
+
+.car-card {
+  transition: all 0.3s;
+}
+
+.car-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.ant-card {
+  background: transparent !important;
+}
+
+.ant-layout-header {
+  background: transparent !important;
+}
+
+.vehicle-card-container {
+  position: relative;
+  background: #141414;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #303030;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+}
+
+.vehicle-card-container:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(24, 144, 255, 0.4);
+  border-color: #1890ff;
+}
+
+.vehicle-image-wrapper {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+
+.vehicle-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.vehicle-card-container:hover .vehicle-image {
+  transform: scale(1.1);
+}
+
+.vehicle-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+  z-index: 1;
+}
+
+.status-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(24, 144, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(24, 144, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(24, 144, 255, 0);
+  }
+}
+
+.vehicle-info {
+  padding: 16px;
+  position: relative;
+  z-index: 2;
+}
+
+.vehicle-plate {
+  background: #1f1f1f;
+  border: 1px solid #434343;
+  color: #fff;
+  font-family: "Consolas", monospace;
+  text-align: center;
+  padding: 8px;
+  border-radius: 8px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.vehicle-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  border-top: 1px solid #303030;
+  padding-top: 12px;
+}
+
+.action-btn {
+  background: transparent;
+  border: none;
+  color: #8c8c8c;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+
+.action-btn:hover {
+  color: #fff;
+}
+
+.action-btn.edit:hover {
+  color: #1890ff;
+}
+.action-btn.delete:hover {
+  color: #ff4d4f;
+}
+
+.light-mode .vehicle-card-container {
+  background: #ffffff;
+  border-color: #f0f0f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.light-mode .vehicle-card-container:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+  border-color: transparent;
+}
+
+.light-mode .vehicle-plate {
+  background: #f5f7fa;
+  border-color: #d9d9d9;
+  color: #262626;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.light-mode .vehicle-actions {
+  border-top-color: #f0f0f0;
+}
+
+.light-mode .action-btn {
+  color: #8c8c8c;
+}
+
+.light-mode .action-btn:hover {
+  color: #595959;
+}
+
+.light-mode .action-btn.edit:hover {
+  color: #1890ff;
+}
+
+.light-mode .action-btn.delete:hover {
+  color: #ff4d4f;
+}
+
+.ant-layout-sider {
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
+}
+
+.ant-layout-sider-children {
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
+}
+
+.ant-layout-sider-zero-width-trigger {
+  transition: all 0.3s ease !important;
+  top: 12px !important;
+  background-color: #1890ff !important;
+  border-radius: 0 6px 6px 0 !important;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.dark-mode .ant-layout-sider-zero-width-trigger {
+  background-color: #1f1f1f !important;
+  color: #fff;
+}
+
+.app-sider {
+  height: 100vh !important;
+  position: sticky !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 100 !important;
+  border-right: 1px solid #f0f0f0;
+}
+
+body.dark-mode .app-sider {
+  border-right: none;
+}
+
+@media (max-width: 992px) {
+  .app-sider {
+    position: fixed !important;
+    z-index: 1000 !important;
+    top: 12px !important;
+    height: calc(100vh - 24px) !important;
+    left: 0;
+    border-radius: 0 16px 16px 0 !important;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+  }
+
+  .ant-layout-sider-zero-width-trigger {
+    top: 12px !important;
+    z-index: 1001 !important;
+  }
+}
+
+.mobile-overlay {
+  display: none;
+}
+
+@media (max-width: 992px) {
+  .mobile-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 900;
+    cursor: pointer;
+    animation: fadeIn 0.3s ease;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (min-width: 993px) {
+  .app-sider {
+    height: calc(100vh - 40px) !important;
+    position: sticky !important;
+    top: 20px !important;
+    margin-left: 20px !important;
+    border-radius: 24px !important;
+    border-right: none !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+
+  body.dark-mode .app-sider {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    background: #141414 !important;
+  }
+
+  body.light-mode .app-sider {
+    background: #ffffff !important;
+  }
+}
+@media (max-width: 768px) {
+  .theme-toggle-btn {
+    display: none !important;
+  }
+}

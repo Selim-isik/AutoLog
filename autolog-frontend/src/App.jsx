@@ -5,8 +5,8 @@ import Dashboard from "./Pages/Dashboard/Dashboard";
 import CarDetail from "./Pages/CarDetail/CarDetail";
 import Customers from "./Pages/Customers/Customers";
 import Settings from "./Pages/Settings/Settings";
-import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword/ResetPassword";
+import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
+import ResetPassword from "./Pages/ResetPassword/ResetPassword";
 function App() {
   return (
     <BrowserRouter>

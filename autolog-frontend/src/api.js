@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://auto-log-sttq.vercel.app/",
+  baseURL: "https://autolog-backend-api.onrender.com/",
   withCredentials: true,
 });
 

@@ -46,23 +46,19 @@ const Settings = () => {
 
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const [form] = Form.useForm();
 
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem("user")) || {
       _id: "fake_id_123",
-      name: "Ahmet Usta",
-      email: "ahmet@autolog.com",
-      role: "mechanic",
+      name: "",
+      email: "",
+      role: "user",
       avatar: null,
     }
   );
-
-  const getAvatarUrl = (name) => {
-    const seed = name ? name.replace(/\s+/g, "") : "User";
-    return `https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}`;
-  };
 
   useEffect(() => {
     form.setFieldsValue({
@@ -74,12 +70,6 @@ const Settings = () => {
       setImageUrl(user.avatar);
     }
   }, [user, form]);
-
-  const getBase64 = (img, callback) => {
-    const reader = new FileReader();
-    reader.addEventListener("load", () => callback(reader.result));
-    reader.readAsDataURL(img);
-  };
 
   const beforeUpload = (file) => {
     const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
@@ -94,15 +84,13 @@ const Settings = () => {
   };
 
   const handleChange = (info) => {
-    if (info.file.status === "uploading") {
-      setLoading(true);
-      return;
+    const file = info.file.originFileObj;
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => setImageUrl(e.target.result);
+      reader.readAsDataURL(file);
     }
-    getBase64(info.file.originFileObj, (url) => {
-      setLoading(false);
-      setImageUrl(url);
-      messageApi.success("Photo uploaded successfully (Preview)");
-    });
   };
 
   const onFinish = async (values) => {
@@ -122,17 +110,21 @@ const Settings = () => {
     }
 
     try {
-      const updateData = {
-        name: values.name,
-        email: values.email,
-        avatar: imageUrl,
-      };
+      const formData = new FormData();
+      formData.append("name", values.name);
+      formData.append("email", values.email);
 
-      if (values.newPassword) {
-        updateData.password = values.newPassword;
+      if (selectedFile) {
+        formData.append("avatar", selectedFile);
       }
 
-      const response = await api.put(`/users/${userId}`, updateData);
+      if (values.newPassword) {
+        formData.append("password", values.newPassword);
+      }
+
+      const response = await api.put(`/users/${userId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       const updatedUserFromBackend = response.data.data;
 
@@ -163,7 +155,7 @@ const Settings = () => {
     }
   };
 
-  const displayAvatar = imageUrl || user.avatar || getAvatarUrl(user.name);
+  const displayAvatar = imageUrl || user.avatar;
 
   return (
     <Layout style={{ minHeight: "100vh", background: "transparent" }}>
@@ -200,12 +192,15 @@ const Settings = () => {
                   <Avatar
                     size={100}
                     src={displayAvatar}
-                    icon={<UserOutlined />}
+                    icon={!displayAvatar && <UserOutlined />}
                     className="profile-avatar"
                     style={{
-                      backgroundColor: "#f0f2f5",
+                      backgroundColor: displayAvatar
+                        ? "transparent"
+                        : "#87d068",
                       border: "4px solid white",
                       boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+                      color: "white",
                     }}
                   />
                   <Upload

@@ -20,6 +20,7 @@ import {
   theme,
   Popconfirm,
   Tag,
+  Upload,
 } from "antd";
 import {
   CarOutlined,
@@ -30,7 +31,6 @@ import {
   SettingOutlined,
   DeleteOutlined,
   EditOutlined,
-  ExclamationCircleOutlined,
   ToolOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -38,6 +38,7 @@ import {
   BarChartOutlined,
   BulbOutlined,
   BulbFilled,
+  UploadOutlined,
 } from "@ant-design/icons";
 import {
   AreaChart,
@@ -55,24 +56,22 @@ import "./Dashboard.css";
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
-const { confirm } = Modal;
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [messageApi, contextHolder] = message.useMessage();
   const [cars, setCars] = useState([]);
-  const [filteredCars, setFilteredCars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCar, setEditingCar] = useState(null);
   const [form] = Form.useForm();
   const [avatarUrl, setAvatarUrl] = useState(null);
-
   const [collapsed, setCollapsed] = useState(false);
+  const [fileList, setFileList] = useState([]);
 
   const { isDarkMode, toggleTheme } = useTheme();
-
   const {
     token: { colorBgContainer, colorBgLayout },
   } = theme.useToken();
@@ -137,14 +136,13 @@ const Dashboard = () => {
       const response = await api.get("/cars");
       const data = response.data.data.data || [];
       setCars(data);
-      setFilteredCars(data);
     } catch (error) {
       console.error(error);
       if (error.response && error.response.status === 401) {
-        message.error("Session expired. Please login again.");
+        messageApi.error("Session expired. Please login again.");
         handleLogout();
       } else {
-        message.error("Failed to fetch cars.");
+        messageApi.error("Failed to fetch cars.");
       }
     } finally {
       setLoading(false);
@@ -159,23 +157,42 @@ const Dashboard = () => {
     if (isModalOpen) {
       setTimeout(() => {
         if (editingCar) {
-          form.setFieldsValue(editingCar);
+          const formValues = { ...editingCar };
+
+          if (formValues.image && typeof formValues.image === "string") {
+            const initialFile = [
+              {
+                uid: "-1",
+                name: "vehicle-image.png",
+                status: "done",
+                url: formValues.image,
+              },
+            ];
+            setFileList(initialFile);
+            formValues.image = initialFile;
+          } else {
+            setFileList([]);
+            formValues.image = [];
+          }
+
+          form.setFieldsValue(formValues);
         } else {
           form.resetFields();
+          setFileList([]);
         }
       }, 0);
     }
   }, [isModalOpen, editingCar, form]);
 
-  useEffect(() => {
+  const filteredCars = useMemo(() => {
+    if (!searchText) return cars;
     const lowerText = searchText.toLowerCase();
-    const filtered = cars.filter(
+    return cars.filter(
       (car) =>
         car.plate.toLowerCase().includes(lowerText) ||
         car.brand.toLowerCase().includes(lowerText) ||
         car.model.toLowerCase().includes(lowerText)
     );
-    setFilteredCars(filtered);
   }, [searchText, cars]);
 
   const handleEdit = (car) => {
@@ -186,29 +203,65 @@ const Dashboard = () => {
   const handleDeleteCar = (carId) => {
     try {
       api.delete(`/cars/${carId}`).then(() => {
-        message.success("Vehicle deleted successfully!");
+        messageApi.success("Vehicle deleted successfully!");
         fetchCars();
       });
     } catch (error) {
-      message.error("Failed to delete vehicle.");
+      messageApi.error("Failed to delete vehicle.");
     }
+  };
+
+  const normFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList;
+  };
+
+  const handleFileChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
   };
 
   const handleSubmit = async (values) => {
     try {
-      const url = editingCar ? `/cars/${editingCar._id}` : "/cars";
-      const method = editingCar ? api.patch : api.post;
+      const formData = new FormData();
+      formData.append("plate", values.plate);
+      formData.append("brand", values.brand);
+      formData.append("model", values.model);
+      formData.append("year", values.year);
 
-      await method(url, values);
+      if (values.status) {
+        formData.append("status", values.status);
+      }
 
-      message.success(
-        `Vehicle successfully ${editingCar ? "updated" : "added"}!`
-      );
+      if (values.ownerId && values.ownerId.trim() !== "") {
+        formData.append("ownerId", values.ownerId);
+      }
+
+      if (fileList.length > 0 && fileList[0].originFileObj) {
+        formData.append("image", fileList[0].originFileObj);
+      } else if (fileList.length === 0 && editingCar && editingCar.image) {
+        formData.append("deleteImage", "true");
+      }
+
+      if (editingCar) {
+        await api.patch(`/cars/${editingCar._id}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        messageApi.success("Vehicle successfully updated!");
+      } else {
+        await api.post("/cars", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        messageApi.success("Vehicle successfully added!");
+      }
+
       setIsModalOpen(false);
       setEditingCar(null);
       fetchCars();
     } catch (error) {
-      message.error(`Error ${editingCar ? "updating" : "adding"} vehicle.`);
+      console.error(error);
+      messageApi.error(`Error ${editingCar ? "updating" : "adding"} vehicle.`);
     }
   };
 
@@ -294,6 +347,7 @@ const Dashboard = () => {
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
+      {contextHolder}
       {!collapsed && (
         <div className="mobile-overlay" onClick={() => setCollapsed(true)} />
       )}
@@ -541,6 +595,7 @@ const Dashboard = () => {
                             />
                             <YAxis hide />
                             <Tooltip
+                              cursor={false}
                               contentStyle={{
                                 borderRadius: 8,
                                 border: "none",
@@ -548,7 +603,7 @@ const Dashboard = () => {
                                 backgroundColor: isDarkMode ? "#333" : "#fff",
                                 color: isDarkMode ? "#fff" : "#000",
                               }}
-                              formatter={(value) => [`${value} TL`, "Revenue"]}
+                              formatter={(value) => [`$${value}`, "Revenue"]}
                             />
                             <Area
                               type="monotone"
@@ -605,9 +660,20 @@ const Dashboard = () => {
                     >
                       <div className="vehicle-image-wrapper">
                         <img
-                          src={`https://loremflickr.com/400/250/${car.brand},car/all?lock=${car._id}`}
+                          src={
+                            car.image
+                              ? car.image
+                              : `https://cdn-icons-png.flaticon.com/512/3202/3202926.png`
+                          }
                           alt={car.model}
                           className="vehicle-image"
+                          style={{
+                            objectFit: car.image ? "cover" : "contain",
+                            padding: car.image ? "0" : "20px",
+                            backgroundColor: car.image
+                              ? "transparent"
+                              : "#f0f2f5",
+                          }}
                         />
                         <div className="vehicle-overlay"></div>
 
@@ -714,6 +780,26 @@ const Dashboard = () => {
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <Form.Item
+            name="image"
+            label="Vehicle Image"
+            valuePropName="fileList"
+            getValueFromEvent={normFile}
+          >
+            <Upload
+              name="image"
+              listType="picture"
+              maxCount={1}
+              beforeUpload={() => false}
+              fileList={fileList}
+              onChange={handleFileChange}
+            >
+              <Button icon={<UploadOutlined />}>
+                Click to Upload Car Image
+              </Button>
+            </Upload>
+          </Form.Item>
+
+          <Form.Item
             name="plate"
             label="Plate Number"
             rules={[{ required: true }]}
@@ -756,16 +842,6 @@ const Dashboard = () => {
                 <Select.Option value="ready">Ready</Select.Option>
                 <Select.Option value="delivered">Delivered</Select.Option>
               </Select>
-            </Form.Item>
-          )}
-
-          {!isMechanic && (
-            <Form.Item
-              name="ownerId"
-              label="Customer ID (Optional)"
-              tooltip="If you leave this empty, the car will belong to YOU."
-            >
-              <Input placeholder="Paste Customer ID (e.g. 65b3...)" />
             </Form.Item>
           )}
 

@@ -3,6 +3,8 @@ import pino from 'pino-http';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import router from './routers/index.js';
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocs from './swagger.js';
 
 const PORT = process.env.PORT || 3000;
 const HOST = '0.0.0.0';
@@ -34,6 +36,8 @@ export const startServer = () => {
       transport: { target: 'pino-pretty' },
     }),
   );
+
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
   app.get('/', (req, res) => {
     res.json({ message: 'Backend OK', allowedOrigins: FRONTEND_URLS });

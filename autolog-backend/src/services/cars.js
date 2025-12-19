@@ -1,124 +1,81 @@
-import { CarsCollection } from '../db/models/car.js';
-
+import { Car } from '../db/models/car.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
-
 import { SORT_ORDER } from '../constants/index.js';
 
 export const getAllCars = async ({
   page = 1,
-
   perPage = 10,
-
-  sortOrder = SORT_ORDER.ASC,
-
-  sortBy = '_id',
-
+  sortBy = 'createdAt',
+  sortOrder = SORT_ORDER.DESC,
   filter = {},
 }) => {
-  const limit = perPage;
+  const limit = parseInt(perPage);
+  const skip = (parseInt(page) - 1) * limit;
 
-  const skip = (page - 1) * perPage;
+  const activeFilter = Object.fromEntries(
+    Object.entries(filter).filter(
+      ([, value]) => value !== undefined && value !== null && value !== '',
+    ),
+  );
 
-  const activeFilter = {};
+  const carsCount = await Car.countDocuments(activeFilter);
 
-  Object.keys(filter).forEach((key) => {
-    if (
-      filter[key] !== undefined &&
-      filter[key] !== null &&
-      filter[key] !== ''
-    ) {
-      activeFilter[key] = filter[key];
-    }
-  });
-
-  console.log('Backend Filtresi:', activeFilter);
-
-  const carsCount = await CarsCollection.countDocuments(activeFilter);
-
-  const cars = await CarsCollection.find(activeFilter)
-
+  const cars = await Car.find(activeFilter)
+    .sort({ [sortBy]: sortOrder === SORT_ORDER.ASC ? 1 : -1 })
     .skip(skip)
-
     .limit(limit)
+    .lean();
 
-    .sort({ [sortBy]: sortOrder })
-
-    .exec();
-
-  const paginationData = calculatePaginationData(carsCount, perPage, page);
+  const paginationData = calculatePaginationData(
+    carsCount,
+    limit,
+    parseInt(page),
+  );
 
   return {
     data: cars,
-
     ...paginationData,
   };
 };
 
 export const getCarById = async (carId) => {
-  const car = await CarsCollection.findById(carId);
-
-  return car;
+  return await Car.findById(carId).lean();
 };
 
 export const createCar = async (payload) => {
-  const car = await CarsCollection.create(payload);
-
-  return car;
+  return await Car.create(payload);
 };
 
 export const deleteCar = async (carId) => {
-  const car = await CarsCollection.findOneAndDelete({ _id: carId });
-
-  return car;
+  return await Car.findByIdAndDelete(carId);
 };
 
 export const updateCar = async (carId, payload, options = {}) => {
-  const rawResult = await CarsCollection.findOneAndUpdate(
-    { _id: carId },
+  const result = await Car.findOneAndUpdate({ _id: carId }, payload, {
+    new: true,
+    upsert: options.upsert || false,
+  });
 
-    payload,
-
-    {
-      new: true,
-
-      includeResultMetadata: true,
-
-      ...options,
-    },
-  );
-
-  if (!rawResult || !rawResult.value) return null;
+  if (!result) return null;
 
   return {
-    car: rawResult.value,
-
-    isNew: Boolean(rawResult?.lastErrorObject?.upserted),
+    car: result,
+    isNew: false,
   };
 };
 
 export const addServiceHistory = async (carId, serviceData) => {
-  const car = await CarsCollection.findOneAndUpdate(
-    { _id: carId },
-    {
-      $push: { history: serviceData }, // $push:
-    },
-    {
-      new: true,
-    },
+  return await Car.findByIdAndUpdate(
+    carId,
+    { $push: { history: serviceData } },
+    { new: true },
   );
-
-  return car;
 };
 
 export const deleteServiceHistory = async (carId, historyId) => {
-  const car = await CarsCollection.findOneAndUpdate(
-    { _id: carId },
-    {
-      $pull: {
-        history: { _id: historyId },
-      },
-    },
+  return await Car.findByIdAndUpdate(
+    carId,
+    { $pull: { history: { _id: historyId } } },
     { new: true },
   );
-  return car;
 };

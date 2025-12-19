@@ -146,6 +146,7 @@ const Login = () => {
                 <Form.Item
                   name="password"
                   label="Password"
+                  style={{ marginBottom: "4px" }}
                   rules={[
                     { required: true, message: "Please enter your password!" },
                   ]}
@@ -156,23 +157,32 @@ const Login = () => {
                   />
                 </Form.Item>
 
-                <Form.Item>
+                <div style={{ textAlign: "right", marginBottom: "16px" }}>
+                  <Link
+                    to="/forgot-password"
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: "500",
+                      color: "#1677ff",
+                    }}
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
+
+                <Form.Item style={{ marginBottom: "12px" }}>
                   <Button
                     type="primary"
                     htmlType="submit"
                     block
                     loading={loading}
-                    style={{
-                      height: "50px",
-                      fontSize: "16px",
-                      marginTop: "10px",
-                    }}
+                    style={{ height: "50px", fontSize: "16px" }}
                   >
                     Log In
                   </Button>
                 </Form.Item>
 
-                <div style={{ textAlign: "center", marginTop: "20px" }}>
+                <div style={{ textAlign: "center" }}>
                   Don't have an account?{" "}
                   <Link
                     to="/register"

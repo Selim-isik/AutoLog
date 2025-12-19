@@ -19,6 +19,10 @@ const carSchema = new Schema(
       type: Number,
       required: true,
     },
+    image: {
+      type: String,
+      default: '',
+    },
     ownerId: {
       type: Schema.Types.ObjectId,
       ref: 'users',
@@ -31,8 +35,8 @@ const carSchema = new Schema(
     },
     history: [
       {
-        action: { type: String, required: true },
-        price: { type: Number, required: true },
+        description: { type: String, required: true },
+        cost: { type: Number, required: true },
         date: { type: Date, default: Date.now },
       },
     ],
@@ -43,4 +47,4 @@ const carSchema = new Schema(
   },
 );
 
-export const CarsCollection = model('cars', carSchema);
+export const Car = model('cars', carSchema);

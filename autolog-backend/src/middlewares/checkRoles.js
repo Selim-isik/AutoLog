@@ -1,5 +1,5 @@
 import createHttpError from 'http-errors';
-import { CarsCollection } from '../db/models/car.js';
+import { Car } from '../db/models/car.js';
 import { ROLES } from '../constants/index.js';
 
 export const checkRoles =
@@ -27,7 +27,7 @@ export const checkRoles =
         return;
       }
 
-      const car = await CarsCollection.findOne({
+      const car = await Car.findOne({
         _id: carId,
         ownerId: user._id,
       });

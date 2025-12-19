@@ -199,12 +199,12 @@ const CarDetail = () => {
 
     const tableData = car.history.map((item) => [
       new Date(item.date).toLocaleDateString(),
-      item.action,
-      `$${item.price}`,
+      item.description || item.action,
+      `$${item.cost || item.price}`,
     ]);
 
     const totalCost = car.history.reduce(
-      (acc, item) => acc + (item.price || 0),
+      (acc, item) => acc + (item.cost || item.price || 0),
       0
     );
 
@@ -257,8 +257,8 @@ const CarDetail = () => {
     ? [...car.history].reverse().map((item) => ({
         id: item._id,
         date: new Date(item.date).toLocaleDateString(),
-        title: item.action,
-        cost: item.price,
+        title: item.description || item.action,
+        cost: item.cost || item.price,
         currency: "$",
       }))
     : [];
@@ -328,8 +328,19 @@ const CarDetail = () => {
         <div style={{ position: "relative" }}>
           <img
             alt="car cover"
-            src={`https://loremflickr.com/800/400/${car.brand},car/all?lock=${car._id}`}
+            src={
+              car.image
+                ? car.image
+                : "https://cdn-icons-png.flaticon.com/512/3202/3202926.png"
+            }
             className="car-cover-image"
+            style={{
+              objectFit: car.image ? "cover" : "contain",
+              padding: car.image ? "0" : "40px",
+              backgroundColor: car.image ? "transparent" : "#f0f2f5",
+              width: "100%",
+              height: "400px",
+            }}
           />
         </div>
 
@@ -372,7 +383,7 @@ const CarDetail = () => {
             >
               {car.status
                 ? car.status.toUpperCase().replace("-", " ")
-                : "UNKOWN"}
+                : "UNKNOWN"}
             </Tag>
           </div>
         </div>
@@ -475,7 +486,7 @@ const CarDetail = () => {
       >
         <Form form={form} layout="vertical" onFinish={handleAddService}>
           <Form.Item
-            name="action"
+            name="description"
             label="Service Description"
             rules={[{ required: true, message: "What was done?" }]}
           >
@@ -483,7 +494,7 @@ const CarDetail = () => {
           </Form.Item>
 
           <Form.Item
-            name="price"
+            name="cost"
             label="Total Cost (USD)"
             rules={[{ required: true, message: "Enter the cost" }]}
           >

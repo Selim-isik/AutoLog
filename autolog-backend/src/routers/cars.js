@@ -1,5 +1,4 @@
 import { Router } from 'express';
-
 import {
   getCarsController,
   getCarByIdController,
@@ -10,14 +9,14 @@ import {
   addServiceController,
   deleteServiceController,
 } from '../controllers/cars.js';
-
 import { validateBody } from '../middlewares/validateBody.js';
-import { createCarSchema, updateCarSchema } from '../validation/cars.js';
+import { createCarSchema } from '../validation/cars.js';
 import { authenticate } from '../middlewares/authenticate.js';
 import { ROLES } from '../constants/index.js';
 import { isValidId } from '../middlewares/isValidId.js';
 import { checkRoles } from '../middlewares/checkRoles.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
+import upload from '../middlewares/uploadMiddleware.js';
 
 const router = Router();
 
@@ -39,16 +38,17 @@ router.get(
 router.post(
   '/',
   checkRoles(ROLES.MECHANIC),
-  validateBody(createCarSchema),
+  upload.single('image'),
   ctrlWrapper(createCarController),
 );
+
 router.post(
   '/:carId/history',
   checkRoles(ROLES.MECHANIC),
   isValidId,
-
   ctrlWrapper(addServiceController),
 );
+
 router.put(
   '/:carId',
   checkRoles(ROLES.MECHANIC),
@@ -61,7 +61,7 @@ router.patch(
   '/:carId',
   checkRoles(ROLES.MECHANIC),
   isValidId,
-  validateBody(updateCarSchema),
+  upload.single('image'),
   ctrlWrapper(updateCarController),
 );
 
@@ -71,6 +71,7 @@ router.delete(
   isValidId,
   ctrlWrapper(deleteCarController),
 );
+
 router.delete(
   '/:carId/history/:historyId',
   checkRoles(ROLES.MECHANIC),

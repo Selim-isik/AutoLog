@@ -12,6 +12,7 @@ const HOST = '0.0.0.0';
 const FRONTEND_URLS = [
   'http://localhost:5173',
   process.env.FRONTEND_URL,
+  'https://auto-log-sttq.vercel.app',
   'https://auto-log-sttq-ipy6e6pe0-selim-isiks-projects.vercel.app',
   'https://auto-log-three.vercel.app',
 ].filter(Boolean);

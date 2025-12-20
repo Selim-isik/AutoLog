@@ -16,23 +16,29 @@ const router = Router();
 /**
  * @swagger
  * /auth/register:
- * post:
- * summary: Register a new user
- * tags: [Auth]
- * requestBody:
- * required: true
- * content:
- * application/json:
- * schema:
- * type: object
- * required: [name, email, password]
- * properties:
- * name: { type: string }
- * email: { type: string }
- * password: { type: string }
- * responses:
- * 201:
- * description: User successfully created
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User successfully created
  */
 router.post(
   '/register',
@@ -43,22 +49,26 @@ router.post(
 /**
  * @swagger
  * /auth/login:
- * post:
- * summary: User login
- * tags: [Auth]
- * requestBody:
- * required: true
- * content:
- * application/json:
- * schema:
- * type: object
- * required: [email, password]
- * properties:
- * email: { type: string }
- * password: { type: string }
- * responses:
- * 200:
- * description: Login successful
+ *   post:
+ *     summary: User login
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
  */
 router.post(
   '/login',
@@ -72,43 +82,49 @@ router.post('/refresh', ctrlWrapper(refreshUserSessionController));
 /**
  * @swagger
  * /auth/request-reset-token:
- * post:
- * summary: Request password reset email
- * tags: [Auth]
- * requestBody:
- * required: true
- * content:
- * application/json:
- * schema:
- * type: object
- * required: [email]
- * properties:
- * email: { type: string }
- * responses:
- * 200:
- * description: Reset link sent
+ *   post:
+ *     summary: Request password reset email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Reset link sent
  */
 router.post('/request-reset-token', ctrlWrapper(requestResetTokenController));
 
 /**
  * @swagger
  * /auth/reset-password:
- * post:
- * summary: Reset password with token
- * tags: [Auth]
- * requestBody:
- * required: true
- * content:
- * application/json:
- * schema:
- * type: object
- * required: [token, password]
- * properties:
- * token: { type: string }
- * password: { type: string }
- * responses:
- * 200:
- * description: Password updated
+ *   post:
+ *     summary: Reset password with token
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *               - password
+ *             properties:
+ *               token:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password updated
  */
 router.post('/reset-password', ctrlWrapper(resetPasswordController));
 

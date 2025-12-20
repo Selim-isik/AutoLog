@@ -13,7 +13,7 @@ import {
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
-import { sendMail } from '../utils/sendMail.js';
+import { sendEmail } from '../utils/sendMail.js';
 import { UsersCollection as User } from '../db/models/user.js';
 
 export const getCarsController = async (req, res, next) => {
@@ -154,7 +154,7 @@ export const updateCarController = async (req, res, next) => {
             .replace('{{historyRows}}', historyRows)
             .replace('{{totalAmount}}', totalCost.toLocaleString());
 
-          await sendMail({
+          await sendEmail({
             to: owner.email,
             subject: `🚗 Vehicle Service Complete - ${result.car.plate}`,
             html: htmlContent,

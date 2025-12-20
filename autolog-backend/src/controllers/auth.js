@@ -11,7 +11,7 @@ import {
 } from '../services/auth.js';
 import { ONE_DAY } from '../constants/index.js';
 import { UsersCollection as User } from '../db/models/user.js';
-import { sendMail } from '../utils/sendMail.js';
+import { sendEmail } from '../utils/sendMail.js';
 import { env } from '../utils/env.js';
 
 const setupSession = (res, session) => {
@@ -100,7 +100,7 @@ export const requestResetTokenController = async (req, res, next) => {
       .replace('{{name}}', user.name || 'Customer')
       .replace('{{link}}', resetLink);
 
-    await sendMail({
+    await sendEmail({
       to: user.email,
       subject: 'Reset your AutoLog password',
       html: htmlContent,

@@ -53,17 +53,23 @@ export const updateCustomerStatusController = async (req, res) => {
 
 export const updateUserController = async (req, res) => {
   const { id } = req.params;
-  const { name, email, avatar, password } = req.body;
+  const { name, email, password } = req.body;
 
-  const updateData = { name, email, avatar };
+  const updateData = {
+    name,
+    email,
+    avatar: req.file ? req.file.path : req.body.avatar,
+  };
 
-  if (password) {
+  if (password && password.trim() !== '') {
     updateData.password = await bcrypt.hash(password, 10);
   }
 
-  const updatedUser = await UsersCollection.findByIdAndUpdate(id, updateData, {
-    new: true,
-  });
+  const updatedUser = await UsersCollection.findByIdAndUpdate(
+    id,
+    { $set: updateData },
+    { new: true },
+  );
 
   if (!updatedUser) {
     return res.status(404).json({ message: 'User not found' });
@@ -75,7 +81,6 @@ export const updateUserController = async (req, res) => {
     data: updatedUser,
   });
 };
-
 export const deleteCustomerController = async (req, res) => {
   const { id } = req.params;
 

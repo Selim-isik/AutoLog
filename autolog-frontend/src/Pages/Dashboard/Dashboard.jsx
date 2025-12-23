@@ -76,28 +76,39 @@ const Dashboard = () => {
     token: { colorBgContainer, colorBgLayout },
   } = theme.useToken();
 
+  const [user, setUser] = useState(
+    JSON.parse(localStorage.getItem("user")) || {
+      name: "Guest",
+      role: "Customer",
+    }
+  );
+
+  const isMechanic = user.role === "mechanic";
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const updatedUser = JSON.parse(localStorage.getItem("user"));
+      if (updatedUser) {
+        setUser(updatedUser);
+        setAvatarUrl(updatedUser.avatar);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    if (user.avatar) {
+      setAvatarUrl(user.avatar);
+    }
+
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, [user.avatar]);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("user_avatar");
     navigate("/login");
   };
-
-  const user = JSON.parse(localStorage.getItem("user")) || {
-    name: "Guest",
-    role: "Customer",
-  };
-
-  const isMechanic = user.role === "mechanic";
-
-  useEffect(() => {
-    const savedAvatar = localStorage.getItem("user_avatar");
-    if (savedAvatar) {
-      setAvatarUrl(savedAvatar);
-    } else if (user.avatar) {
-      setAvatarUrl(user.avatar);
-    }
-  }, []);
 
   const chartData = useMemo(() => {
     const months = [
@@ -127,7 +138,6 @@ const Dashboard = () => {
         });
       }
     });
-
     return data;
   }, [cars]);
 
@@ -158,7 +168,6 @@ const Dashboard = () => {
       setTimeout(() => {
         if (editingCar) {
           const formValues = { ...editingCar };
-
           if (formValues.image && typeof formValues.image === "string") {
             const initialFile = [
               {
@@ -174,7 +183,6 @@ const Dashboard = () => {
             setFileList([]);
             formValues.image = [];
           }
-
           form.setFieldsValue(formValues);
         } else {
           form.resetFields();
@@ -201,26 +209,21 @@ const Dashboard = () => {
   };
 
   const handleDeleteCar = (carId) => {
-    try {
-      api.delete(`/cars/${carId}`).then(() => {
+    api
+      .delete(`/cars/${carId}`)
+      .then(() => {
         messageApi.success("Vehicle deleted successfully!");
         fetchCars();
+      })
+      .catch(() => {
+        messageApi.error("Failed to delete vehicle.");
       });
-    } catch (error) {
-      messageApi.error("Failed to delete vehicle.");
-    }
   };
 
-  const normFile = (e) => {
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e?.fileList;
-  };
+  const normFile = (e) => (Array.isArray(e) ? e : e?.fileList);
 
-  const handleFileChange = ({ fileList: newFileList }) => {
+  const handleFileChange = ({ fileList: newFileList }) =>
     setFileList(newFileList);
-  };
 
   const handleSubmit = async (values) => {
     try {
@@ -229,15 +232,9 @@ const Dashboard = () => {
       formData.append("brand", values.brand);
       formData.append("model", values.model);
       formData.append("year", values.year);
-
-      if (values.status) {
-        formData.append("status", values.status);
-      }
-
-      if (values.ownerId && values.ownerId.trim() !== "") {
+      if (values.status) formData.append("status", values.status);
+      if (values.ownerId && values.ownerId.trim() !== "")
         formData.append("ownerId", values.ownerId);
-      }
-
       if (fileList.length > 0 && fileList[0].originFileObj) {
         formData.append("image", fileList[0].originFileObj);
       } else if (fileList.length === 0 && editingCar && editingCar.image) {
@@ -255,7 +252,6 @@ const Dashboard = () => {
         });
         messageApi.success("Vehicle successfully added!");
       }
-
       setIsModalOpen(false);
       setEditingCar(null);
       fetchCars();
@@ -345,6 +341,10 @@ const Dashboard = () => {
     },
   ];
 
+  const currentAvatar = avatarUrl
+    ? `${avatarUrl}?t=${new Date().getTime()}`
+    : null;
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       {contextHolder}
@@ -369,7 +369,6 @@ const Dashboard = () => {
           </Title>
           <Text type="secondary">Digital Car Service</Text>
         </div>
-
         <Menu
           theme={isDarkMode ? "dark" : "light"}
           mode="inline"
@@ -377,9 +376,7 @@ const Dashboard = () => {
           selectedKeys={[location.pathname === "/customers" ? "2" : "1"]}
           items={menuItems}
           onClick={() => {
-            if (window.innerWidth < 992) {
-              setCollapsed(true);
-            }
+            if (window.innerWidth < 992) setCollapsed(true);
           }}
         />
       </Sider>
@@ -416,12 +413,10 @@ const Dashboard = () => {
 
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <Button
-              className="theme-toggle-btn"
               shape="circle"
               icon={isDarkMode ? <BulbFilled /> : <BulbOutlined />}
               onClick={toggleTheme}
             />
-
             <Dropdown menu={{ items: userMenu }} trigger={["click"]}>
               <div
                 style={{
@@ -431,16 +426,7 @@ const Dashboard = () => {
                   cursor: "pointer",
                   padding: "4px 12px",
                   borderRadius: "8px",
-                  transition: "background 0.3s",
                 }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.background = isDarkMode
-                    ? "rgba(255,255,255,0.1)"
-                    : "#f5f5f5")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.background = "transparent")
-                }
               >
                 <div
                   style={{
@@ -467,14 +453,12 @@ const Dashboard = () => {
                     {user.role ? user.role.toUpperCase() : "GUEST"}
                   </Tag>
                 </div>
-
                 <Avatar
                   size="large"
-                  src={avatarUrl}
+                  src={currentAvatar}
                   style={{
                     backgroundColor:
                       user.role === "mechanic" ? "#1890ff" : "#52c41a",
-                    verticalAlign: "middle",
                     boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
                   }}
                   icon={<UserOutlined />}
@@ -542,7 +526,6 @@ const Dashboard = () => {
                     </Col>
                   </Row>
                 </Col>
-
                 {isMechanic && (
                   <Col xs={24} lg={8}>
                     <Card
@@ -635,7 +618,6 @@ const Dashboard = () => {
                   style={{ width: 320, height: 40, borderRadius: 8 }}
                   allowClear
                 />
-
                 {isMechanic && (
                   <Button
                     type="primary"
@@ -661,9 +643,8 @@ const Dashboard = () => {
                       <div className="vehicle-image-wrapper">
                         <img
                           src={
-                            car.image
-                              ? car.image
-                              : `https://cdn-icons-png.flaticon.com/512/3202/3202926.png`
+                            car.image ||
+                            `https://cdn-icons-png.flaticon.com/512/3202/3202926.png`
                           }
                           alt={car.model}
                           className="vehicle-image"
@@ -676,7 +657,6 @@ const Dashboard = () => {
                           }}
                         />
                         <div className="vehicle-overlay"></div>
-
                         <div
                           className="status-badge"
                           style={{
@@ -693,7 +673,6 @@ const Dashboard = () => {
                           {car.status?.toUpperCase().replace("-", " ")}
                         </div>
                       </div>
-
                       <div className="vehicle-info">
                         <div
                           style={{
@@ -717,11 +696,9 @@ const Dashboard = () => {
                             </Title>
                           </div>
                         </div>
-
                         <div className="vehicle-plate">
                           {car.plate.toUpperCase()}
                         </div>
-
                         {isMechanic && (
                           <div className="vehicle-actions">
                             <button
@@ -733,14 +710,12 @@ const Dashboard = () => {
                             >
                               <EditOutlined /> Edit
                             </button>
-
                             <Popconfirm
                               title="Delete Vehicle"
                               onConfirm={(e) => {
                                 e.stopPropagation();
                                 handleDeleteCar(car._id);
                               }}
-                              onCancel={(e) => e.stopPropagation()}
                               okText="Yes"
                               cancelText="No"
                             >
@@ -757,14 +732,6 @@ const Dashboard = () => {
                     </div>
                   </Col>
                 ))}
-
-                {filteredCars.length === 0 && (
-                  <Col span={24} style={{ textAlign: "center", marginTop: 40 }}>
-                    <Text type="secondary" style={{ fontSize: 16 }}>
-                      No vehicles found matching "{searchText}"
-                    </Text>
-                  </Col>
-                )}
               </Row>
             </>
           )}
@@ -798,7 +765,6 @@ const Dashboard = () => {
               </Button>
             </Upload>
           </Form.Item>
-
           <Form.Item
             name="plate"
             label="Plate Number"
@@ -829,7 +795,6 @@ const Dashboard = () => {
           <Form.Item name="year" label="Year" rules={[{ required: true }]}>
             <InputNumber style={{ width: "100%" }} min={1900} max={2025} />
           </Form.Item>
-
           {editingCar && (
             <Form.Item
               name="status"
@@ -844,7 +809,6 @@ const Dashboard = () => {
               </Select>
             </Form.Item>
           )}
-
           {isMechanic && (
             <Form.Item
               name="ownerId"
@@ -854,7 +818,6 @@ const Dashboard = () => {
               <Input placeholder="Paste Customer ID (e.g. 65b3...)" />
             </Form.Item>
           )}
-
           <Button
             type="primary"
             htmlType="submit"

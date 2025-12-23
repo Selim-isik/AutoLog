@@ -39,15 +39,11 @@ const { useBreakpoint } = Grid;
 const Settings = () => {
   const navigate = useNavigate();
   const { isDarkMode, toggleTheme } = useTheme();
-
   const screens = useBreakpoint();
-
   const [messageApi, contextHolder] = message.useMessage();
-
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
-
   const [form] = Form.useForm();
 
   const [user, setUser] = useState(
@@ -95,8 +91,8 @@ const Settings = () => {
 
   const onFinish = async (values) => {
     setLoading(true);
-
     const userId = user._id || user.id;
+
     if (!userId) {
       messageApi.error("User ID not found. Cannot update.");
       setLoading(false);
@@ -127,9 +123,7 @@ const Settings = () => {
       });
 
       const updatedUserFromBackend = response.data.data;
-
       localStorage.setItem("user", JSON.stringify(updatedUserFromBackend));
-
       setUser(updatedUserFromBackend);
       window.dispatchEvent(new Event("storage"));
 
@@ -155,12 +149,15 @@ const Settings = () => {
     }
   };
 
-  const displayAvatar = imageUrl || user.avatar;
+  const displayAvatar = imageUrl
+    ? imageUrl.startsWith("data:")
+      ? imageUrl
+      : `${imageUrl}?t=${new Date().getTime()}`
+    : user.avatar;
 
   return (
     <Layout style={{ minHeight: "100vh", background: "transparent" }}>
       {contextHolder}
-
       <Content className="settings-container">
         <div
           style={{
@@ -218,7 +215,6 @@ const Settings = () => {
                     />
                   </Upload>
                 </div>
-
                 <Title level={4} style={{ marginTop: 16, marginBottom: 4 }}>
                   {user.name}
                 </Title>
@@ -226,9 +222,7 @@ const Settings = () => {
                   {user.role ? user.role.toUpperCase() : "USER"}
                 </Tag>
               </div>
-
               <Divider />
-
               <div className="preferences-section">
                 <div className="preference-item">
                   <span>{screens.md && <BulbOutlined />} Dark Mode</span>
@@ -285,11 +279,9 @@ const Settings = () => {
                     </Form.Item>
                   </Col>
                 </Row>
-
                 <Divider titlePlacement="left" plain>
                   <span style={{ fontSize: 14, color: "#999" }}>Security</span>
                 </Divider>
-
                 <Row gutter={16}>
                   <Col span={12}>
                     <Form.Item label="New Password" name="newPassword">
@@ -308,7 +300,6 @@ const Settings = () => {
                     </Form.Item>
                   </Col>
                 </Row>
-
                 <div
                   style={{
                     marginTop: 16,

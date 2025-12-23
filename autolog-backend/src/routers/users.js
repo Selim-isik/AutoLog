@@ -6,7 +6,7 @@ import {
   deleteCustomerController,
   updateUserController,
 } from '../controllers/users.js';
-
+import upload from '../middlewares/uploadMiddleware.js';
 import { authenticate } from '../middlewares/authenticate.js';
 import { checkRoles } from '../middlewares/checkRoles.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
@@ -137,8 +137,7 @@ router.patch(
  *       200:
  *         description: User updated successfully
  */
-router.put('/:id', ctrlWrapper(updateUserController));
-
+router.put('/:id', upload.single('avatar'), ctrlWrapper(updateUserController));
 /**
  * @swagger
  * /users/{id}:
